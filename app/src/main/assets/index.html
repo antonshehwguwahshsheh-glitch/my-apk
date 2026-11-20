@@ -5,42 +5,38 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
-  body { overflow: hidden; background: #1a1f2c; font-family: sans-serif; color: #fff; }
+  body { overflow: hidden; background: #141824; font-family: sans-serif; color: #fff; }
   canvas { display: block; width: 100vw; height: 100vh; }
-  .scr { position: absolute; inset: 0; background: #141824; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; z-index: 10; }
+  .scr { position: absolute; inset: 0; background: #141824; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; z-index: 10; }
   .hid { display: none !important; }
-  .btn { background: #00c853; border: none; color: #fff; padding: 14px 32px; font-size: 20px; font-weight: bold; border-radius: 10px; box-shadow: 0 4px 0 #007e33; }
-  select { background: #262e42; color: #fff; padding: 8px 14px; border-radius: 8px; border: 1px solid #445170; font-size: 16px; }
-  #hud { position: absolute; top: 12px; left: 15px; right: 15px; display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; z-index: 5; pointer-events: none; }
-  #mBtn { pointer-events: auto; background: rgba(0,0,0,0.5); color: #fff; border: 1px solid #555; padding: 6px 14px; border-radius: 8px; }
-  .ctrl { position: absolute; bottom: 20px; width: 75px; height: 75px; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; z-index: 5; }
-  .ctrl:active { background: rgba(255,255,255,0.45); }
+  .btn { background: #00c853; border: none; color: #fff; padding: 14px 32px; font-size: 20px; font-weight: bold; border-radius: 10px; }
+  select, input { background: #262e42; color: #fff; padding: 8px; border-radius: 8px; border: 1px solid #445170; font-size: 16px; }
+  #hud { position: absolute; top: 12px; left: 15px; right: 15px; display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; z-index: 5; pointer-events: none; text-shadow: 1px 1px 2px #000; }
+  #mBtn { pointer-events: auto; background: rgba(0,0,0,0.6); color: #fff; border: 1px solid #666; padding: 6px 14px; border-radius: 8px; }
+  #jumpBtn { position: absolute; right: 25px; bottom: 25px; width: 85px; height: 85px; background: rgba(0,230,118,0.35); border: 2px solid #00e676; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; z-index: 6; }
+  #jumpBtn:active { background: rgba(0,230,118,0.7); }
 </style>
 </head>
 <body>
 
 <div id="menu" class="scr">
-  <h1 style="color:#00e676; font-size:32px;">ROBLOX OBBY 2D</h1>
-  <div>Скин: <select id="skin">
-    <option value="noob">Классический Нуб</option>
-    <option value="gold">Золотой VIP</option>
-    <option value="cyber">Кибер-Ниндзя</option>
-    <option value="fire">Огненный</option>
+  <h1 style="color:#00e676;">3D OBBY: 1-Е ЛИЦО</h1>
+  <div>Перчатки: <select id="skin">
+    <option value="#ffeb3b">Нуб (Жёлтые)</option>
+    <option value="#ffd700">Золото VIP</option>
+    <option value="#00e5ff">Кибер-неон</option>
+    <option value="#ff1744">Красный дракон</option>
   </select></div>
-  <button class="btn" onclick="start()">ИГРАТЬ</button>
+  <div>Чувствительность: <input type="range" id="sens" min="2" max="10" value="5"></div>
+  <button class="btn" onclick="start()">ИГРАТЬ В 3D</button>
 </div>
 
 <div id="hud" class="hid">
-  <div>Этап: <span id="stage">1</span> / 5 | Смертей: <span id="deaths">0</span></div>
+  <div>Этап: <span id="st">1</span> | Смертей: <span id="dt">0</span></div>
   <button id="mBtn" onclick="stop()">МЕНЮ</button>
 </div>
 
-<div id="controls" class="hid">
-  <div id="btnL" class="ctrl" style="left:20px;">◀</div>
-  <div id="btnR" class="ctrl" style="left:110px;">▶</div>
-  <div id="btnJ" class="ctrl" style="right:25px; width:85px; height:85px; background:rgba(0,230,118,0.3);">▲</div>
-</div>
-
+<div id="jumpBtn" class="hid">▲</div>
 <canvas id="c"></canvas>
 <script src="game.js"></script>
 </body>

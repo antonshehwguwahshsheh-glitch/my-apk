@@ -32,7 +32,7 @@ function updateMenuSkins() {
     opt.innerText = locked ? '🔒 ' + s.name : '✅ ' + s.name;
     sel.appendChild(opt);
   }
-  if (cur && ![...sel.options].find(o => o.value === cur)?.disabled) sel.value = cur;
+  if (cur && !Array.from(sel.options).find(o => o.value === cur)?.disabled) sel.value = cur;
 }
 updateMenuSkins();
 
@@ -67,9 +67,11 @@ bind('bF', 'f'); bind('bB', 'b'); bind('bL', 'l'); bind('bR', 'r'); bind('jumpBt
 
 c.ontouchstart = e => {
   e.preventDefault();
-  if (!look.on && e.changedTouches.length > 0) {
-    let t = e.changedTouches;
-    look = { on: true, id: t.identifier, lx: t.clientX, ly: t.clientY };
+  for (let t of e.changedTouches) {
+    if (!look.on) {
+      look = { on: true, id: t.identifier, lx: t.clientX, ly: t.clientY };
+      break;
+    }
   }
 };
 c.ontouchmove = e => {
@@ -77,9 +79,7 @@ c.ontouchmove = e => {
   let sens = +document.getElementById('sens').value * 0.0016;
   for (let t of e.changedTouches) {
     if (look.on && t.identifier === look.id) {
-      // Поворот влево-вправо
-      p.yaw -= (t.clientX - look.lx) * sens;
-      // Наклон камеры вверх-вниз с ограничением, чтобы не перевернуться
+      p.yaw += (t.clientX - look.lx) * sens;
       p.pitch -= (t.clientY - look.ly) * sens;
       if (p.pitch > 1.1) p.pitch = 1.1;
       if (p.pitch < -1.1) p.pitch = -1.1;
@@ -169,7 +169,6 @@ function project(x, y, z) {
   let rx = dx * cy - dz * sy;
   let rz = dx * sy + dz * cy;
   let rawZ = rz;
-  // Учитываем наклон камеры вверх и вниз (p.pitch)
   let sp = Math.sin(p.pitch), cp = Math.cos(p.pitch);
   let ry = dy * cp - rz * sp;
   let fz = dy * sp + rz * cp;
@@ -186,7 +185,7 @@ function drawQuad(p1, p2, p3, p4, col) {
 
 function draw3D() {
   ctx.fillStyle = '#4fc3f7'; ctx.fillRect(0, 0, W, H);
-  let sorted = [...plats].sort((a, b) => Math.hypot(b.x + b.w/2 - p.x, b.z + b.d/2 - p.z) - Math.hypot(a.x + a.w/2 - p.x, a.z + a.d/2 - p.z));
+  let sorted = Array.from(plats).sort((a, b) => Math.hypot(b.x + b.w/2 - p.x, b.z + b.d/2 - p.z) - Math.hypot(a.x + a.w/2 - p.x, a.z + a.d/2 - p.z));
 
   for (let pl of sorted) {
     let c1 = project(pl.x, pl.y, pl.z), c2 = project(pl.x + pl.w, pl.y, pl.z);
@@ -214,4 +213,4 @@ function draw3D() {
   ctx.strokeRect(W * 0.28, H - 80 + bob, 40, 100);
   ctx.strokeRect(W * 0.72 - 40, H - 80 - bob, 40, 100);
        }
-                                
+    

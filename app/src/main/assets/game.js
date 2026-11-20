@@ -1,8 +1,8 @@
 const c = document.getElementById('c'), ctx = c.getContext('2d');
 let W, H, run = false, lastT = 0, deaths = 0, stage = 1;
-let p = { x: 0, y: 35, z: 0, vy: 0, yaw: 0, ground: false, sx: 0, sy: 35, sz: 0 };
+let p = { x: 0, y: 35, z: 0, vy: 0, yaw: 0, pitch: -0.22, ground: false, sx: 0, sy: 35, sz: 0 };
 let keys = { f: false, b: false, l: false, r: false, j: false };
-let look = { on: false, id: 0, lx: 0 }, plats = [];
+let look = { on: false, id: 0, lx: 0, ly: 0 }, plats = [];
 
 const ALL_SKINS = [
   { id: '#ffeb3b', name: 'Нуб (Жёлтые)', req: 0 },
@@ -68,17 +68,23 @@ bind('bF', 'f'); bind('bB', 'b'); bind('bL', 'l'); bind('bR', 'r'); bind('jumpBt
 c.ontouchstart = e => {
   e.preventDefault();
   if (!look.on && e.changedTouches.length > 0) {
-    let t = e.changedTouches[0];
-    look = { on: true, id: t.identifier, lx: t.clientX };
+    let t = e.changedTouches;
+    look = { on: true, id: t.identifier, lx: t.clientX, ly: t.clientY };
   }
 };
 c.ontouchmove = e => {
   e.preventDefault();
-  let sens = +document.getElementById('sens').value * 0.0018;
+  let sens = +document.getElementById('sens').value * 0.0016;
   for (let t of e.changedTouches) {
     if (look.on && t.identifier === look.id) {
-      p.yaw += (t.clientX - look.lx) * sens;
+      // Поворот влево-вправо
+      p.yaw -= (t.clientX - look.lx) * sens;
+      // Наклон камеры вверх-вниз с ограничением, чтобы не перевернуться
+      p.pitch -= (t.clientY - look.ly) * sens;
+      if (p.pitch > 1.1) p.pitch = 1.1;
+      if (p.pitch < -1.1) p.pitch = -1.1;
       look.lx = t.clientX;
+      look.ly = t.clientY;
     }
   }
 };
@@ -98,7 +104,7 @@ function start() {
   if (ctrls) ctrls.classList.remove('hid');
   document.getElementById('jumpBtn').classList.remove('hid');
   deaths = 0; stage = 1;
-  p = { x: 0, y: 40, z: 30, vy: 0, yaw: 0, ground: false, sx: 0, sy: 40, sz: 30 };
+  p = { x: 0, y: 40, z: 30, vy: 0, yaw: 0, pitch: -0.22, ground: false, sx: 0, sy: 40, sz: 30 };
   build3DLevel(); run = true; requestAnimationFrame(loop);
 }
 
@@ -163,7 +169,8 @@ function project(x, y, z) {
   let rx = dx * cy - dz * sy;
   let rz = dx * sy + dz * cy;
   let rawZ = rz;
-  let sp = Math.sin(-0.24), cp = Math.cos(-0.24);
+  // Учитываем наклон камеры вверх и вниз (p.pitch)
+  let sp = Math.sin(p.pitch), cp = Math.cos(p.pitch);
   let ry = dy * cp - rz * sp;
   let fz = dy * sp + rz * cp;
   if (fz < 6) fz = 6;
@@ -206,5 +213,5 @@ function draw3D() {
   ctx.strokeStyle = '#111'; ctx.lineWidth = 3;
   ctx.strokeRect(W * 0.28, H - 80 + bob, 40, 100);
   ctx.strokeRect(W * 0.72 - 40, H - 80 - bob, 40, 100);
-      }
-          
+       }
+                                

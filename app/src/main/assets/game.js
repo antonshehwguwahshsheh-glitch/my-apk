@@ -58,6 +58,7 @@ window.onresize = resize; resize();
 
 function bind(id, k) {
   let el = document.getElementById(id);
+  if (!el) return;
   el.ontouchstart = e => { e.preventDefault(); keys[k] = true; };
   el.ontouchend = e => { e.preventDefault(); keys[k] = false; };
   el.ontouchcancel = e => { keys[k] = false; };
@@ -66,25 +67,36 @@ bind('bF', 'f'); bind('bB', 'b'); bind('bL', 'l'); bind('bR', 'r'); bind('jumpBt
 
 c.ontouchstart = e => {
   e.preventDefault();
-  if (!look.on) { let t = e.changedTouches[0]; look = { on: true, id: t.identifier, lx: t.clientX }; }
+  if (!look.on && e.changedTouches.length > 0) {
+    let t = e.changedTouches[0];
+    look = { on: true, id: t.identifier, lx: t.clientX };
+  }
 };
 c.ontouchmove = e => {
   e.preventDefault();
   let sens = +document.getElementById('sens').value * 0.0018;
   for (let t of e.changedTouches) {
-    if (look.on && t.identifier === look.id) { p.yaw += (t.clientX - look.lx) * sens; look.lx = t.clientX; }
+    if (look.on && t.identifier === look.id) {
+      p.yaw += (t.clientX - look.lx) * sens;
+      look.lx = t.clientX;
+    }
   }
 };
 c.ontouchend = e => {
-  for (let t of e.changedTouches) if (t.identifier === look.id) look.on = false;
+  for (let t of e.changedTouches) {
+    if (t.identifier === look.id) look.on = false;
+  }
 };
 
 function start() {
   saveProf();
-  document.getElementById('hudNick').innerText = prof.nick;
+  let hudNick = document.getElementById('hudNick');
+  if (hudNick) hudNick.innerText = prof.nick;
   document.getElementById('menu').classList.add('hid');
   document.getElementById('hud').classList.remove('hid');
-  document.getElementById('ctrls').classList.remove('hid');
+  let ctrls = document.getElementById('ctrls');
+  if (ctrls) ctrls.classList.remove('hid');
+  document.getElementById('jumpBtn').classList.remove('hid');
   deaths = 0; stage = 1;
   p = { x: 0, y: 40, z: 30, vy: 0, yaw: 0, ground: false, sx: 0, sy: 40, sz: 30 };
   build3DLevel(); run = true; requestAnimationFrame(loop);
@@ -94,7 +106,9 @@ function stop() {
   run = false;
   updateMenuSkins();
   document.getElementById('hud').classList.add('hid');
-  document.getElementById('ctrls').classList.add('hid');
+  let ctrls = document.getElementById('ctrls');
+  if (ctrls) ctrls.classList.add('hid');
+  document.getElementById('jumpBtn').classList.add('hid');
   document.getElementById('menu').classList.remove('hid');
 }
 
@@ -192,5 +206,5 @@ function draw3D() {
   ctx.strokeStyle = '#111'; ctx.lineWidth = 3;
   ctx.strokeRect(W * 0.28, H - 80 + bob, 40, 100);
   ctx.strokeRect(W * 0.72 - 40, H - 80 - bob, 40, 100);
-    }
+      }
           
